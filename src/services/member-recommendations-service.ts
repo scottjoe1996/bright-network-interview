@@ -1,4 +1,5 @@
 import Fuse from "fuse.js";
+import nlp from "compromise";
 
 import { Job, Member } from "../apis/job-matcher-api";
 
@@ -8,13 +9,18 @@ export class MemberRecommendationsService {
   constructor(private availableJobs: Job[]) {}
 
   public getRecommendations(member: Member): Job[] {
-    const eachWordInBio = removePunctuation(member.bio).split(" ");
+    const formattedBio = removePunctuation(member.bio);
+    const eachWordInBio = formattedBio.split(" ");
+    const mentionsAnyLocations =
+      (nlp(formattedBio).places().json() as object[]).length > 0;
 
-    const recommendedJobs = this.availableJobs.filter(
-      (job) =>
-        this.isTitleMentioned(eachWordInBio, job.title) &&
-        this.isLocationMentioned(eachWordInBio, job.location)
-    );
+    const recommendedJobs = this.availableJobs.filter((job) => {
+      const locationFilter = mentionsAnyLocations
+        ? this.isLocationMentioned(eachWordInBio, job.location)
+        : true;
+
+      return this.isTitleMentioned(eachWordInBio, job.title) && locationFilter;
+    });
 
     return recommendedJobs;
   }

@@ -71,7 +71,7 @@ describe("MemberRecommendationsService", () => {
     it.each([
       [MEMBERS[0], [AVAILABLE_JOBS[6]]],
       [MEMBERS[1], [AVAILABLE_JOBS[3], AVAILABLE_JOBS[5]]],
-      [MEMBERS[2], []], // TODO: add logic to ignore locations
+      [MEMBERS[2], [AVAILABLE_JOBS[6]]],
       [MEMBERS[3], []], // TODO: add logic to exclude locations
       [MEMBERS[4], [AVAILABLE_JOBS[0], AVAILABLE_JOBS[7]]], // TODO: add logic to exclude locations
     ])("should return expected jobs", (member, expectedJobs) => {
