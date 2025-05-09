@@ -17,7 +17,7 @@ export class MemberRecommendationsService {
       }
     });
 
-    return recommendedJobs;
+    return recommendedJobs.length === 0 ? this.availableJobs : recommendedJobs;
   }
 
   private isTitleMentioned(bio: string, title: string): boolean {

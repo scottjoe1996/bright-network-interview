@@ -77,5 +77,14 @@ describe("MemberRecommendationsService", () => {
     ])("should return expected jobs", (member, expectedJobs) => {
       expect(service.getRecommendations(member)).toEqual(expectedJobs);
     });
+
+    it("should return all jobs if bio matches no job titles/locations", () => {
+      expect(
+        service.getRecommendations({
+          name: "Steve",
+          bio: "I've always wanted to be an astronaut on the moon",
+        })
+      ).toEqual(AVAILABLE_JOBS);
+    });
   });
 });
