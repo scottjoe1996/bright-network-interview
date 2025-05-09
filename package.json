@@ -1,0 +1,13 @@
+{
+  "name": "bright-network-interview",
+  "version": "1.0.0",
+  "scripts": {
+    "match-jobs": "tsx src/match-jobs.ts"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
