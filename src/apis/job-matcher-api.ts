@@ -38,8 +38,20 @@ export class JobMatcherApi implements JobMatcherApiI {
 
   public getJobs(): Promise<Job[]> {
     return this.fetchArrayResponse(`${this.jobMatcherUri}/jobs.json`).then(
-      async (responseJson) => {
-        throw new Error("Not implemented");
+      (responseJson) => {
+        const invalidObjectIndex = responseJson.findIndex(
+          (obj) => !this.isSimpleObject<Job>(obj, ["title", "location"])
+        );
+
+        if (invalidObjectIndex !== -1) {
+          throw new Error(
+            `Response item [${JSON.stringify(
+              responseJson[invalidObjectIndex]
+            )}] is not a valid Job object`
+          );
+        }
+
+        return responseJson as Job[];
       }
     );
   }

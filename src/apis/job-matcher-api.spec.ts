@@ -1,10 +1,14 @@
-import { Member, JobMatcherApi } from "./job-matcher-api";
+import { Member, JobMatcherApi, Job } from "./job-matcher-api";
 
 const API_URI = "https://domain.com";
 
 const MEMBERS: Member[] = [
   { name: "Steve", bio: "Send me anywhere" },
   { name: "Dave", bio: "Anywhere without Steve" },
+];
+const JOBS: Job[] = [
+  { title: "Astronaut", location: "Moon" },
+  { title: "Cosmonaut", location: "Mars" },
 ];
 
 describe("JobMatcherApi", () => {
@@ -77,6 +81,19 @@ describe("JobMatcherApi", () => {
   });
 
   describe("getJobs", () => {
+    it.each([[[]], [[JOBS[0]]], [JOBS]])(
+      "should resolve with expected Jobs",
+      async (expectedJobs) => {
+        fetchMock.mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve(expectedJobs),
+        });
+        await expect(api.getJobs()).resolves.toEqual(expectedJobs);
+
+        expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/jobs.json`);
+      }
+    );
+
     it("should reject if response is not ok", async () => {
       fetchMock.mockResolvedValue({
         ok: false,
@@ -101,5 +118,24 @@ describe("JobMatcherApi", () => {
 
       expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/jobs.json`);
     });
+
+    it.each([[undefined], [null], [""], [[]], [{ any: "object" }], [5]])(
+      "should reject if response contains object that is not a Job",
+      async (invalidObject) => {
+        fetchMock.mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve([JOBS[0], invalidObject]),
+        });
+        await expect(api.getJobs()).rejects.toEqual(
+          new Error(
+            `Response item [${JSON.stringify(
+              invalidObject
+            )}] is not a valid Job object`
+          )
+        );
+
+        expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/jobs.json`);
+      }
+    );
   });
 });
