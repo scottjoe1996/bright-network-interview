@@ -2,11 +2,14 @@
   "name": "bright-network-interview",
   "version": "1.0.0",
   "scripts": {
+    "test": "jest",
     "match-jobs": "tsx src/match-jobs.ts"
   },
   "keywords": [],
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "ts-jest": "^29.3.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
