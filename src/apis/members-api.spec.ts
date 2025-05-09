@@ -24,5 +24,18 @@ describe("MembersApi", () => {
 
       expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/members.json`);
     });
+
+    it("should reject if response is not an array", async () => {
+      const invalidObject = { any: "object" };
+      fetchMock.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(invalidObject),
+      });
+      await expect(api.getMembers()).rejects.toEqual(
+        new Error("Members response is not an array")
+      );
+
+      expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/members.json`);
+    });
   });
 });

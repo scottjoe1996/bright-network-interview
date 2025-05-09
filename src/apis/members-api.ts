@@ -16,6 +16,12 @@ export class MembersApi implements MembersApiI {
         throw new Error(`Request failed with status code [${response.status}]`);
       }
 
+      const responseJson = await response.json();
+
+      if (!Array.isArray(responseJson)) {
+        throw new Error("Members response is not an array");
+      }
+
       throw new Error("Not implemented");
     });
   }
