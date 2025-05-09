@@ -12,5 +12,8 @@
     "ts-jest": "^29.3.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "fuse.js": "^7.1.0"
   }
 }

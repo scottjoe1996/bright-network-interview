@@ -1,4 +1,7 @@
+import Fuse from "fuse.js";
+
 import { Job, Member } from "../apis/job-matcher-api";
+
 import { removePunctuation } from "./remove-punctuation";
 
 export class MemberRecommendationsService {
@@ -18,13 +21,19 @@ export class MemberRecommendationsService {
   }
 
   private isTitleMentioned(bio: string, title: string): boolean {
-    const formattedBio = removePunctuation(bio).toLowerCase();
-    const eachWordsOfTitle = title.toLowerCase().split(" ");
+    const eachWordInBio = removePunctuation(bio).split(" ");
+    const eachWordInTitle = title.toLocaleLowerCase().split(" ");
 
-    const titleIsMentioned = eachWordsOfTitle.some((word) =>
-      formattedBio.includes(word)
-    );
+    const fuse = new Fuse(eachWordInBio, {
+      threshold: 0.3,
+    });
 
-    return titleIsMentioned;
+    const isTitleMentioned = eachWordInTitle.some((word) => {
+      const results = fuse.search(word);
+
+      return results.length > 0;
+    });
+
+    return isTitleMentioned;
   }
 }
