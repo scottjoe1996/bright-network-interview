@@ -1,4 +1,5 @@
 import { getConfig } from "./config";
+import { MemberRecommendationsService } from "./services/member-recommendations-service";
 
 const config = getConfig();
 
@@ -6,21 +7,18 @@ Promise.all([
   config.jobMatchApi.getJobs(),
   config.jobMatchApi.getMembers(),
 ]).then(([jobs, members]) => {
-  console.log("JOBS");
-  jobs.forEach((job) => {
-    console.group();
-    console.log(`TITLE: ${job.title}`);
-    console.log(`LOCATION: ${job.location} \n`);
-    console.groupEnd();
-  });
+  const memberRecommendationsService = new MemberRecommendationsService(jobs);
 
-  console.log("MEMBERS");
   members.forEach((member) => {
+    const recommendedJobs =
+      memberRecommendationsService.getRecommendations(member);
+
+    console.log(member.name);
     console.group();
-    console.log(`NAME: ${member.name}`);
-    console.log(`BIO: ${member.bio} \n`);
+    recommendedJobs.forEach((job) => {
+      console.log(job.title);
+    });
+    console.log("\n");
     console.groupEnd();
   });
-
-  console.log("I will match jobs later I swear!");
 });
