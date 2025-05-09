@@ -3,11 +3,11 @@ export interface Member {
   bio: string;
 }
 
-export interface MembersApiI {
+export interface JobMatcherApiI {
   getMembers: () => Promise<Member[]>;
 }
 
-export class MembersApi implements MembersApiI {
+export class JobMatcherApi implements JobMatcherApiI {
   constructor(private membersUri: string) {}
 
   public getMembers(): Promise<Member[]> {

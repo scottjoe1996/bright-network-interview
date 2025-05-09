@@ -1,4 +1,4 @@
-import { Member, MembersApi } from "./members-api";
+import { Member, JobMatcherApi } from "./job-matcher-api";
 
 const API_URI = "https://domain.com";
 
@@ -7,14 +7,14 @@ const MEMBERS: Member[] = [
   { name: "Dave", bio: "Anywhere without Steve" },
 ];
 
-describe("MembersApi", () => {
-  let api: MembersApi;
+describe("JobMatcherApi", () => {
+  let api: JobMatcherApi;
   let fetchMock: jest.Mock;
 
   beforeEach(() => {
     fetchMock = jest.fn();
     global.fetch = fetchMock;
-    api = new MembersApi(API_URI);
+    api = new JobMatcherApi(API_URI);
   });
 
   describe("getMembers", () => {
