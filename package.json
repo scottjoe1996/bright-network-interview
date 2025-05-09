@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "jest",
-    "match-jobs": "tsx src/match-jobs.ts"
+    "match-jobs": "tsx --env-file=.env src/match-jobs.ts"
   },
   "keywords": [],
   "license": "ISC",
