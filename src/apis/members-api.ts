@@ -22,7 +22,31 @@ export class MembersApi implements MembersApiI {
         throw new Error("Members response is not an array");
       }
 
-      throw new Error("Not implemented");
+      const invalidObjectIndex = responseJson.findIndex(
+        (obj) => !this.isMember(obj)
+      );
+
+      if (invalidObjectIndex !== -1) {
+        throw new Error(
+          `Response item [${JSON.stringify(
+            responseJson[invalidObjectIndex]
+          )}] is not a valid Member object`
+        );
+      }
+
+      return responseJson as Member[];
     });
+  }
+
+  private isMember(obj: unknown): obj is Member {
+    return (
+      obj !== null &&
+      obj !== undefined &&
+      typeof obj === "object" &&
+      "name" in obj &&
+      typeof obj.name === "string" &&
+      "bio" in obj &&
+      typeof obj.bio === "string"
+    );
   }
 }

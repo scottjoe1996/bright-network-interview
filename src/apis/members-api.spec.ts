@@ -1,6 +1,11 @@
-import { MembersApi } from "./members-api";
+import { Member, MembersApi } from "./members-api";
 
 const API_URI = "https://domain.com";
+
+const MEMBERS: Member[] = [
+  { name: "Steve", bio: "Send me anywhere" },
+  { name: "Dave", bio: "Anywhere without Steve" },
+];
 
 describe("MembersApi", () => {
   let api: MembersApi;
@@ -13,6 +18,19 @@ describe("MembersApi", () => {
   });
 
   describe("getMembers", () => {
+    it.each([[[]], [[MEMBERS[0]]], [MEMBERS]])(
+      "should resolve with expected members",
+      async (expectedMembers) => {
+        fetchMock.mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve(expectedMembers),
+        });
+        await expect(api.getMembers()).resolves.toEqual(expectedMembers);
+
+        expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/members.json`);
+      }
+    );
+
     it("should reject if response is not ok", async () => {
       fetchMock.mockResolvedValue({
         ok: false,
@@ -37,5 +55,24 @@ describe("MembersApi", () => {
 
       expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/members.json`);
     });
+
+    it.each([[undefined], [null], [""], [[]], [{ any: "object" }], [5]])(
+      "should reject if response contains object that is not a member",
+      async (invalidObject) => {
+        fetchMock.mockResolvedValue({
+          ok: true,
+          json: () => Promise.resolve([MEMBERS[0], invalidObject]),
+        });
+        await expect(api.getMembers()).rejects.toEqual(
+          new Error(
+            `Response item [${JSON.stringify(
+              invalidObject
+            )}] is not a valid Member object`
+          )
+        );
+
+        expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/members.json`);
+      }
+    );
   });
 });
