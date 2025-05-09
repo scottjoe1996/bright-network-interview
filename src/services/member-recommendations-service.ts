@@ -7,21 +7,19 @@ import { removePunctuation } from "./remove-punctuation";
 export class MemberRecommendationsService {
   constructor(private availableJobs: Job[]) {}
 
-  // TODO: add location filter
   public getRecommendations(member: Member): Job[] {
-    const recommendedJobs: Job[] = [];
+    const eachWordInBio = removePunctuation(member.bio).split(" ");
 
-    this.availableJobs.forEach((job) => {
-      if (this.isTitleMentioned(member.bio, job.title)) {
-        recommendedJobs.push(job);
-      }
-    });
+    const recommendedJobs = this.availableJobs.filter(
+      (job) =>
+        this.isTitleMentioned(eachWordInBio, job.title) &&
+        this.isLocationMentioned(eachWordInBio, job.location)
+    );
 
-    return recommendedJobs.length === 0 ? this.availableJobs : recommendedJobs;
+    return recommendedJobs;
   }
 
-  private isTitleMentioned(bio: string, title: string): boolean {
-    const eachWordInBio = removePunctuation(bio).split(" ");
+  private isTitleMentioned(eachWordInBio: string[], title: string): boolean {
     const eachWordInTitle = title.toLocaleLowerCase().split(" ");
 
     const fuse = new Fuse(eachWordInBio, {
@@ -35,5 +33,18 @@ export class MemberRecommendationsService {
     });
 
     return isTitleMentioned;
+  }
+
+  private isLocationMentioned(
+    eachWordInBio: string[],
+    location: string
+  ): boolean {
+    const fuse = new Fuse(eachWordInBio, {
+      threshold: 0.3,
+    });
+
+    const results = fuse.search(location);
+
+    return results.length > 0;
   }
 }
