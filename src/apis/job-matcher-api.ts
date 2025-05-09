@@ -20,7 +20,7 @@ export class JobMatcherApi implements JobMatcherApiI {
     return this.fetchArrayResponse(`${this.jobMatcherUri}/members.json`).then(
       (responseJson) => {
         const invalidObjectIndex = responseJson.findIndex(
-          (obj) => !this.isMember(obj)
+          (obj) => !this.isSimpleObject<Member>(obj, ["name", "bio"])
         );
 
         if (invalidObjectIndex !== -1) {
@@ -60,15 +60,16 @@ export class JobMatcherApi implements JobMatcherApiI {
     });
   }
 
-  private isMember(obj: unknown): obj is Member {
+  private isSimpleObject<T>(obj: unknown, keys: string[]): obj is T {
     return (
       obj !== null &&
       obj !== undefined &&
       typeof obj === "object" &&
-      "name" in obj &&
-      typeof obj.name === "string" &&
-      "bio" in obj &&
-      typeof obj.bio === "string"
+      keys.every(
+        (key) =>
+          key in obj &&
+          typeof (obj as Record<string, unknown>)[key] === "string"
+      )
     );
   }
 }
