@@ -50,7 +50,7 @@ describe("JobMatcherApi", () => {
         json: () => Promise.resolve(invalidObject),
       });
       await expect(api.getMembers()).rejects.toEqual(
-        new Error("Members response is not an array")
+        new Error("Response is not an array")
       );
 
       expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/members.json`);
@@ -74,5 +74,32 @@ describe("JobMatcherApi", () => {
         expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/members.json`);
       }
     );
+  });
+
+  describe("getJobs", () => {
+    it("should reject if response is not ok", async () => {
+      fetchMock.mockResolvedValue({
+        ok: false,
+        status: 404,
+      });
+      await expect(api.getJobs()).rejects.toEqual(
+        new Error("Request failed with status code [404]")
+      );
+
+      expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/jobs.json`);
+    });
+
+    it("should reject if response is not an array", async () => {
+      const invalidObject = { any: "object" };
+      fetchMock.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(invalidObject),
+      });
+      await expect(api.getJobs()).rejects.toEqual(
+        new Error("Response is not an array")
+      );
+
+      expect(fetchMock).toHaveBeenCalledWith(`${API_URI}/jobs.json`);
+    });
   });
 });
