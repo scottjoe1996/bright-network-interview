@@ -11,7 +11,27 @@ export class JobMatcherApi implements JobMatcherApiI {
   constructor(private membersUri: string) {}
 
   public getMembers(): Promise<Member[]> {
-    return fetch(`${this.membersUri}/members.json`).then(async (response) => {
+    return this.fetchArrayResponse(`${this.membersUri}/members.json`).then(
+      async (responseJson) => {
+        const invalidObjectIndex = responseJson.findIndex(
+          (obj) => !this.isMember(obj)
+        );
+
+        if (invalidObjectIndex !== -1) {
+          throw new Error(
+            `Response item [${JSON.stringify(
+              responseJson[invalidObjectIndex]
+            )}] is not a valid Member object`
+          );
+        }
+
+        return responseJson as Member[];
+      }
+    );
+  }
+
+  private fetchArrayResponse(url: string): Promise<unknown[]> {
+    return fetch(url).then(async (response) => {
       if (!response.ok) {
         throw new Error(`Request failed with status code [${response.status}]`);
       }
@@ -22,19 +42,7 @@ export class JobMatcherApi implements JobMatcherApiI {
         throw new Error("Members response is not an array");
       }
 
-      const invalidObjectIndex = responseJson.findIndex(
-        (obj) => !this.isMember(obj)
-      );
-
-      if (invalidObjectIndex !== -1) {
-        throw new Error(
-          `Response item [${JSON.stringify(
-            responseJson[invalidObjectIndex]
-          )}] is not a valid Member object`
-        );
-      }
-
-      return responseJson as Member[];
+      return responseJson;
     });
   }
 
